@@ -4,6 +4,8 @@
 
 A sophisticated, client-side RSS feed aggregator and AI-powered summarization tool that translates news articles into Arabic and generates comprehensive summaries using advanced language models. Built with privacy and security as core principles, this application runs entirely in your browser without requiring any backend infrastructure.
 
+https://xsukax-rss-feeds-arabic-ai-summarizer.pages.dev/
+
 ## 🎯 Project Overview
 
 **xsukax RSS Feeds Arabic AI Summarizer** is a powerful web application designed to help Arabic-speaking users stay informed about global news. The application aggregates RSS feeds from multiple sources, intelligently filters recent articles, translates titles to Arabic, and generates detailed, high-quality summaries in Modern Standard Arabic (MSA) using AI language models.
