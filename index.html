@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xsukax RSS Feeds Arabic AI Summarizer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%); color: #c9d1d9; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #1f6feb 0%, #0d1117 100%); padding: 40px 30px; margin-bottom: 30px; border-radius: 12px; text-align: center; box-shadow: 0 8px 32px rgba(31, 111, 235, 0.3); }
+        h1 { font-size: 2.2em; color: #ffffff; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .brand { color: #58a6ff; font-weight: 800; }
+        .panel { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #21262d; }
+        .panel-header h2 { font-size: 1.3em; color: #58a6ff; flex: 1; font-weight: 600; }
+        .panel-header .icon { font-size: 1.5em; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #8b949e; font-size: 0.9em; font-weight: 500; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 0.95em; transition: all 0.2s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #1f6feb; box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1); }
+        .form-group textarea { resize: vertical; min-height: 100px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+        .btn { padding: 10px 20px; background: linear-gradient(135deg, #1f6feb 0%, #1158c7 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.95em; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(31, 111, 235, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: linear-gradient(135deg, #30363d 0%, #21262d 100%); }
+        .btn-secondary:hover { box-shadow: 0 6px 16px rgba(48, 54, 61, 0.4); }
+        .btn-success { background: linear-gradient(135deg, #3fb950 0%, #2ea043 100%); }
+        .btn-success:hover { box-shadow: 0 6px 16px rgba(63, 185, 80, 0.4); }
+        .btn-danger { background: linear-gradient(135deg, #f85149 0%, #da3633 100%); }
+        .btn-danger:hover { box-shadow: 0 6px 16px rgba(248, 81, 73, 0.4); }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .stat-card:hover { border-color: #1f6feb; }
+        .stat-label { color: #8b949e; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+        .stat-value { color: #58a6ff; font-size: 1.9em; font-weight: 700; }
+        .progress-container { background: #0d1117; border-radius: 6px; height: 8px; overflow: hidden; margin: 15px 0; border: 1px solid #30363d; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #1f6feb 0%, #58a6ff 100%); transition: width 0.3s; border-radius: 6px; }
+        .log { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 15px; max-height: 280px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.85em; }
+        .log-entry { margin-bottom: 4px; padding: 4px 0; }
+        .log-entry.info { color: #58a6ff; }
+        .log-entry.success { color: #3fb950; }
+        .log-entry.warning { color: #f0883e; }
+        .log-entry.error { color: #f85149; }
+        .article { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin-bottom: 18px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .article::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, #1f6feb, #58a6ff); }
+        .article:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(31, 111, 235, 0.15); border-color: #1f6feb; }
+        .article-header { margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #21262d; }
+        .article-title { font-size: 1.25em; color: #58a6ff; margin-bottom: 8px; font-weight: 600; line-height: 1.4; }
+        .article-title a { color: inherit; text-decoration: none; transition: color 0.2s; }
+        .article-title a:hover { color: #79c0ff; text-decoration: underline; }
+        .article-title-ar { font-size: 1.15em; color: #8b949e; margin-bottom: 10px; font-weight: 500; direction: rtl; text-align: right; font-style: italic; }
+        .article-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 0.85em; }
+        .badge { background: linear-gradient(135deg, #1f6feb 0%, #1158c7 100%); color: #ffffff; padding: 4px 10px; border-radius: 12px; font-size: 0.9em; font-weight: 600; }
+        .badge.success { background: linear-gradient(135deg, #3fb950 0%, #2ea043 100%); }
+        .badge.warning { background: linear-gradient(135deg, #f0883e 0%, #db6b28 100%); }
+        .badge.error { background: linear-gradient(135deg, #f85149 0%, #da3633 100%); }
+        .article-summary { color: #c9d1d9; font-size: 1em; line-height: 1.8; padding: 15px; background: #0d1117; border-radius: 6px; direction: rtl; text-align: right; border-right: 3px solid #1f6feb; }
+        .article-summary p { margin-bottom: 12px; }
+        .article-summary p:last-child { margin-bottom: 0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #21262d; }
+        .modal-header h3 { color: #58a6ff; font-size: 1.4em; }
+        .modal-close { background: none; border: none; color: #8b949e; font-size: 1.5em; cursor: pointer; padding: 0; width: 32px; height: 32px; border-radius: 6px; transition: all 0.2s; }
+        .modal-close:hover { background: #21262d; color: #f85149; }
+        .modal-body { color: #c9d1d9; line-height: 1.6; }
+        .modal-footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #21262d; display: flex; gap: 10px; justify-content: flex-end; }
+        .hidden { display: none; }
+        .spinner { border: 3px solid #30363d; border-top: 3px solid #1f6feb; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 60px 20px; color: #8b949e; }
+        .empty-state-icon { font-size: 4em; margin-bottom: 20px; opacity: 0.5; }
+        .empty-state-text { font-size: 1.2em; margin-bottom: 10px; }
+        .empty-state-subtext { font-size: 0.95em; }
+        @media (max-width: 768px) { h1 { font-size: 1.6em; } .panel { padding: 18px; } .stats { grid-template-columns: repeat(2, 1fr); } .btn-group { flex-direction: column; } .btn { width: 100%; justify-content: center; } .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span class="brand">xsukax</span> RSS Feeds Arabic AI Summarizer</h1>
+        </header>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">⚙️</span>
+                <h2>Configuration</h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>AI API URL</label>
+                    <input type="text" id="apiUrl" placeholder="https://api.openai.com/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label>AI Model</label>
+                    <input type="text" id="modelName" placeholder="gpt-4" value="gpt-4">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>AI API Key</label>
+                <input type="password" id="apiKey" placeholder="sk-...">
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>News Duration (hours)</label>
+                    <input type="number" id="duration" value="24" min="1" max="168">
+                </div>
+                <div class="form-group">
+                    <label>CORS Proxy URL</label>
+                    <input type="text" id="corsProxy" placeholder="https://corsproxy.io/?url=" value="https://corsproxy.io/?url=">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>RSS Feeds (one per line)</label>
+                <textarea id="rssFeeds" placeholder="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml&#10;https://feeds.bbci.co.uk/news/rss.xml&#10;https://www.aljazeera.com/xml/rss/all.xml"></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="saveConfig()">💾 Save Config</button>
+                <button class="btn btn-secondary" onclick="loadConfig()">📂 Load Config</button>
+                <button class="btn btn-secondary" onclick="exportConfig()">📥 Export Config</button>
+                <button class="btn" onclick="loadFromStorage()">🔄 Load from Browser</button>
+            </div>
+            <input type="file" id="configFileInput" accept=".json" class="hidden" onchange="importConfig(event)">
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">🚀</span>
+                <h2>Control Panel</h2>
+            </div>
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-label">Total Articles</span>
+                    <span class="stat-value" id="statTotal">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Processed</span>
+                    <span class="stat-value" id="statProcessed" style="color: #3fb950;">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Failed</span>
+                    <span class="stat-value" id="statFailed" style="color: #f85149;">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Success Rate</span>
+                    <span class="stat-value" id="statRate">0%</span>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" id="startBtn" onclick="startProcessing()">▶️ Start Processing</button>
+                <button class="btn btn-danger hidden" id="stopBtn" onclick="stopProcessing()">⏹️ Stop</button>
+                <button class="btn btn-secondary" onclick="clearResults()">🗑️ Clear Results</button>
+                <button class="btn btn-secondary" onclick="exportResults()">📤 Export HTML</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">📋</span>
+                <h2>Processing Log</h2>
+            </div>
+            <div class="log" id="log"></div>
+        </div>
+
+        <div class="panel" id="resultsPanel">
+            <div class="panel-header">
+                <span class="icon">📑</span>
+                <h2>News Articles</h2>
+            </div>
+            <div id="articles">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📰</div>
+                    <div class="empty-state-text">No articles yet</div>
+                    <div class="empty-state-subtext">Configure your settings and click "Start Processing" to begin</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Action</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Are you sure you want to proceed?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirmBtn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let config = {
+            apiUrl: 'https://api.openai.com/v1/chat/completions',
+            apiKey: '',
+            modelName: 'gpt-4',
+            duration: 24,
+            rssFeeds: [],
+            corsProxy: 'https://corsproxy.io/?url='
+        };
+        
+        let articles = [];
+        let isProcessing = false;
+        let shouldStop = false;
+        let modalCallback = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            log('✅ xsukax RSS Summarizer initialized', 'success');
+        });
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStats() {
+            const total = articles.length;
+            const processed = articles.filter(a => a.processed).length;
+            const failed = articles.filter(a => a.failed).length;
+            const rate = total > 0 ? Math.round((processed / total) * 100) : 0;
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statProcessed').textContent = processed;
+            document.getElementById('statFailed').textContent = failed;
+            document.getElementById('statRate').textContent = rate + '%';
+            
+            const progress = total > 0 ? ((processed + failed) / total) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function saveConfig() {
+            config.apiUrl = document.getElementById('apiUrl').value.trim();
+            config.apiKey = document.getElementById('apiKey').value.trim();
+            config.modelName = document.getElementById('modelName').value.trim();
+            config.duration = parseInt(document.getElementById('duration').value);
+            config.rssFeeds = document.getElementById('rssFeeds').value.split('\n').filter(f => f.trim()).map(f => f.trim());
+            config.corsProxy = document.getElementById('corsProxy').value.trim();
+            
+            localStorage.setItem('xsukaxRssConfig', JSON.stringify(config));
+            log('✅ Configuration saved to browser storage', 'success');
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('xsukaxRssConfig');
+            if (saved) {
+                try {
+                    config = JSON.parse(saved);
+                    document.getElementById('apiUrl').value = config.apiUrl || '';
+                    document.getElementById('apiKey').value = config.apiKey || '';
+                    document.getElementById('modelName').value = config.modelName || 'gpt-4';
+                    document.getElementById('duration').value = config.duration || 24;
+                    document.getElementById('rssFeeds').value = (config.rssFeeds || []).join('\n');
+                    document.getElementById('corsProxy').value = config.corsProxy || 'https://corsproxy.io/?url=';
+                    log('✅ Configuration loaded from browser storage', 'success');
+                } catch (e) {
+                    log('⚠️ Error loading saved config: ' + e.message, 'warning');
+                }
+            }
+        }
+
+        function exportConfig() {
+            saveConfig();
+            const dataStr = JSON.stringify(config, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'xsukax-rss-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            log('📥 Configuration exported', 'success');
+        }
+
+        function loadConfig() {
+            document.getElementById('configFileInput').click();
+        }
+
+        function importConfig(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        config = JSON.parse(e.target.result);
+                        document.getElementById('apiUrl').value = config.apiUrl || '';
+                        document.getElementById('apiKey').value = config.apiKey || '';
+                        document.getElementById('modelName').value = config.modelName || 'gpt-4';
+                        document.getElementById('duration').value = config.duration || 24;
+                        document.getElementById('rssFeeds').value = (config.rssFeeds || []).join('\n');
+                        document.getElementById('corsProxy').value = config.corsProxy || 'https://corsproxy.io/?url=';
+                        localStorage.setItem('xsukaxRssConfig', JSON.stringify(config));
+                        log('✅ Configuration imported successfully', 'success');
+                    } catch (err) {
+                        log('❌ Error importing config: ' + err.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            event.target.value = '';
+        }
+
+        async function fetchRSSFeeds() {
+            saveConfig();
+            articles = [];
+            const cutoffTime = Date.now() - (config.duration * 60 * 60 * 1000);
+            
+            log('📡 Fetching RSS feeds...', 'info');
+            
+            for (const feedUrl of config.rssFeeds) {
+                if (shouldStop) break;
+                
+                try {
+                    log(`→ Fetching: ${feedUrl}`, 'info');
+                    const proxyUrl = config.corsProxy + encodeURIComponent(feedUrl);
+                    const response = await fetch(proxyUrl);
+                    const text = await response.text();
+                    
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(text, 'text/xml');
+                    
+                    const items = xml.querySelectorAll('item, entry');
+                    let count = 0;
+                    
+                    items.forEach(item => {
+                        const title = item.querySelector('title')?.textContent || 'Untitled';
+                        const link = item.querySelector('link')?.textContent || item.querySelector('link')?.getAttribute('href') || '';
+                        const description = item.querySelector('description, summary')?.textContent || '';
+                        const pubDateStr = item.querySelector('pubDate, published, updated')?.textContent || '';
+                        
+                        let pubDate = new Date(pubDateStr);
+                        if (isNaN(pubDate.getTime())) {
+                            pubDate = new Date();
+                        }
+                        
+                        if (pubDate.getTime() >= cutoffTime) {
+                            const sourceName = xml.querySelector('channel > title, feed > title')?.textContent || new URL(feedUrl).hostname;
+                            articles.push({
+                                title: title.trim(),
+                                titleAr: '',
+                                link: link.trim(),
+                                description: description.replace(/<[^>]*>/g, '').trim().substring(0, 500),
+                                published: pubDate,
+                                source: sourceName.trim(),
+                                summary: '',
+                                processed: false,
+                                failed: false
+                            });
+                            count++;
+                        }
+                    });
+                    
+                    log(`✓ Found ${count} recent articles`, 'success');
+                } catch (err) {
+                    log(`✗ Error fetching ${feedUrl}: ${err.message}`, 'error');
+                }
+            }
+            
+            articles.sort((a, b) => b.published - a.published);
+            log(`✅ Total articles found: ${articles.length}`, 'success');
+            updateStats();
+            displayArticles();
+        }
+
+        async function callAI(messages, temperature = 0.7, maxTokens = 800) {
+            const response = await fetch(config.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${config.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: config.modelName,
+                    messages: messages,
+                    temperature: temperature,
+                    max_tokens: maxTokens
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content?.trim() || '';
+        }
+
+        async function translateTitle(title) {
+            try {
+                const messages = [
+                    {
+                        role: 'system',
+                        content: 'أنت مترجم محترف متخصص في ترجمة عناوين الأخبار من جميع اللغات إلى العربية الفصحى.'
+                    },
+                    {
+                        role: 'user',
+                        content: `ترجم العنوان التالي إلى اللغة العربية الفصحى بشكل دقيق واحترافي:\n\n"${title}"\n\nقدم الترجمة فقط بدون أي نص إضافي.`
+                    }
+                ];
+                return await callAI(messages, 0.3, 200);
+            } catch (err) {
+                log(`⚠️ Translation failed: ${err.message}`, 'warning');
+                return title;
+            }
+        }
+
+        async function summarizeContent(content, title, source) {
+            try {
+                const prompt = `قم بتلخيص المقال التالي بالعربية الفصحى بشكل شامل ومفصل.
+
+المصدر: ${source}
+العنوان: ${title}
+المحتوى: ${content}
+
+المطلوب:
+- اكتب ملخصاً مكوناً من فقرتين بالضبط
+- كل فقرة يجب أن تحتوي على 4-5 جمل كاملة ومفصلة
+- الفقرة الأولى: الموضوع الرئيسي والأحداث الأساسية
+- الفقرة الثانية: التفاصيل الإضافية والسياق والتأثير
+- استخدم لغة عربية فصحى واضحة وسلسة
+
+قدم الملخص المكون من فقرتين فقط بدون أي نص إضافي.`;
+
+                const messages = [
+                    {
+                        role: 'system',
+                        content: 'أنت محرر أخبار محترف متخصص في كتابة ملخصات إخبارية شاملة ومفصلة باللغة العربية الفصحى. تلتزم دائماً بكتابة فقرتين، كل منها تحتوي على 4-5 جمل.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ];
+                
+                return await callAI(messages, 0.7, 800);
+            } catch (err) {
+                log(`❌ Summarization failed: ${err.message}`, 'error');
+                return `خطأ في إنشاء الملخص: ${err.message}`;
+            }
+        }
+
+        async function processArticle(article, index) {
+            if (shouldStop) return;
+            
+            try {
+                log(`[${index + 1}/${articles.length}] Processing: ${article.title.substring(0, 60)}...`, 'info');
+                
+                log('  → Translating title...', 'info');
+                article.titleAr = await translateTitle(article.title);
+                await sleep(1000);
+                
+                log('  → Generating summary...', 'info');
+                const content = article.description || article.title;
+                article.summary = await summarizeContent(content, article.title, article.source);
+                await sleep(1000);
+                
+                article.processed = true;
+                log(`  ✓ Completed successfully`, 'success');
+            } catch (err) {
+                article.failed = true;
+                article.summary = `خطأ في المعالجة: ${err.message}`;
+                log(`  ✗ Failed: ${err.message}`, 'error');
+            }
+            
+            updateStats();
+            displayArticles();
+        }
+
+        async function startProcessing() {
+            if (isProcessing) return;
+            
+            if (!config.apiKey || config.apiKey === '' || config.apiKey === 'your-api-key-here') {
+                log('❌ Please configure your API key first!', 'error');
+                return;
+            }
+            
+            if (!config.rssFeeds || config.rssFeeds.length === 0) {
+                log('❌ Please add RSS feeds first!', 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            shouldStop = false;
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('stopBtn').classList.remove('hidden');
+            
+            log('🚀 Starting processing pipeline...', 'info');
+            
+            await fetchRSSFeeds();
+            
+            if (articles.length === 0) {
+                log('❌ No articles found to process', 'error');
+                stopProcessing();
+                return;
+            }
+            
+            for (let i = 0; i < articles.length; i++) {
+                if (shouldStop) break;
+                await processArticle(articles[i], i);
+            }
+            
+            log('✅ Processing completed!', 'success');
+            stopProcessing();
+        }
+
+        function stopProcessing() {
+            shouldStop = true;
+            isProcessing = false;
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            if (shouldStop && isProcessing) {
+                log('⏹️ Processing stopped', 'warning');
+            }
+        }
+
+        function displayArticles() {
+            const container = document.getElementById('articles');
+            
+            if (articles.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📰</div>
+                        <div class="empty-state-text">No articles yet</div>
+                        <div class="empty-state-subtext">Configure your settings and click "Start Processing" to begin</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            articles.forEach((article, index) => {
+                const articleDiv = document.createElement('div');
+                articleDiv.className = 'article';
+                
+                const statusBadge = article.processed 
+                    ? '<span class="badge success">✓ Processed</span>'
+                    : article.failed 
+                    ? '<span class="badge error">✗ Failed</span>'
+                    : '<span class="badge">⏳ Pending</span>';
+                
+                const summaryParagraphs = article.summary.split('\n\n').map(p => 
+                    p.trim() ? `<p>${p}</p>` : ''
+                ).join('');
+                
+                articleDiv.innerHTML = `
+                    <div class="article-header">
+                        <h3 class="article-title">
+                            <a href="${article.link}" target="_blank" rel="noopener noreferrer">${article.title}</a>
+                        </h3>
+                        ${article.titleAr ? `<div class="article-title-ar">${article.titleAr}</div>` : ''}
+                        <div class="article-meta">
+                            ${statusBadge}
+                            <span class="badge">${article.source}</span>
+                            <span style="color: #8b949e;">${article.published.toLocaleString()}</span>
+                            <span class="badge" style="background: #21262d;">#${index + 1}</span>
+                        </div>
+                    </div>
+                    ${article.summary ? `<div class="article-summary">${summaryParagraphs}</div>` : ''}
+                `;
+                
+                container.appendChild(articleDiv);
+            });
+        }
+
+        function clearResults() {
+            showModal('Are you sure you want to clear all results?', () => {
+                articles = [];
+                document.getElementById('articles').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📰</div>
+                        <div class="empty-state-text">No articles yet</div>
+                        <div class="empty-state-subtext">Configure your settings and click "Start Processing" to begin</div>
+                    </div>
+                `;
+                updateStats();
+                log('🗑️ Results cleared', 'info');
+                closeModal();
+            });
+        }
+
+        function exportResults() {
+            if (articles.length === 0) {
+                log('❌ No articles to export', 'error');
+                return;
+            }
+            
+            const articlesHtml = articles.map((article, i) => {
+                const summaryParagraphs = article.summary.split('\n\n').map(p => 
+                    p.trim() ? `<p>${p}</p>` : ''
+                ).join('');
+                
+                const statusBadge = article.processed ? 'معالج' : article.failed ? 'فشل' : 'معلق';
+                
+                return `
+                <div class="article">
+                    <div class="article-header">
+                        <h2 class="article-title">
+                            <a href="${article.link}" target="_blank" rel="noopener">${article.title}</a>
+                        </h2>
+                        <div class="article-title-ar">${article.titleAr || ''}</div>
+                        <div class="article-meta">
+                            <span class="badge">${statusBadge}</span>
+                            <span class="badge">${article.source}</span>
+                            <span class="time">🕐 ${article.published.toLocaleString()}</span>
+                            <span class="number">#${i + 1}</span>
+                        </div>
+                    </div>
+                    <div class="summary">${summaryParagraphs}</div>
+                </div>`;
+            }).join('');
+            
+            const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xsukax RSS Feeds Arabic AI Summarizer Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Arabic', 'Cairo', Roboto, sans-serif; background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%); color: #c9d1d9; line-height: 1.8; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1f6feb 0%, #0d1117 100%); padding: 50px 30px; margin-bottom: 40px; border-radius: 16px; text-align: center; box-shadow: 0 8px 32px rgba(31, 111, 235, 0.3); }
+        h1 { font-size: 2.5em; color: #ffffff; margin-bottom: 12px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .brand { color: #58a6ff; font-weight: 800; }
+        .subtitle { color: #8b949e; font-size: 1.1em; margin-top: 10px; }
+        .article { background: #161b22; border: 1px solid #30363d; border-radius: 14px; padding: 30px; margin-bottom: 25px; position: relative; }
+        .article::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: linear-gradient(180deg, #1f6feb, #58a6ff); }
+        .article-header { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 2px solid #21262d; }
+        .article-title { font-size: 1.45em; color: #58a6ff; margin-bottom: 8px; font-weight: 600; line-height: 1.4; }
+        .article-title a { color: inherit; text-decoration: none; }
+        .article-title a:hover { text-decoration: underline; }
+        .article-title-ar { font-size: 1.3em; color: #8b949e; margin-bottom: 12px; font-weight: 500; font-style: italic; }
+        .article-meta { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; font-size: 0.9em; color: #8b949e; }
+        .badge { background: linear-gradient(135deg, #1f6feb 0%, #1158c7 100%); color: #ffffff; padding: 5px 12px; border-radius: 14px; font-weight: 600; font-size: 0.85em; }
+        .time { display: flex; align-items: center; gap: 5px; }
+        .number { background: #21262d; color: #58a6ff; padding: 4px 10px; border-radius: 8px; font-weight: 600; font-size: 0.85em; }
+        .summary { color: #c9d1d9; font-size: 1.08em; line-height: 2; text-align: justify; padding: 20px; background: #0d1117; border-radius: 8px; border-right: 3px solid #1f6feb; }
+        .summary p { margin-bottom: 1.2em; }
+        .summary p:last-child { margin-bottom: 0; }
+        footer { text-align: center; margin-top: 60px; padding: 30px; border-top: 1px solid #30363d; color: #8b949e; font-size: 0.9em; }
+        footer p { margin-bottom: 10px; }
+        @media (max-width: 768px) { h1 { font-size: 1.8em; } .article { padding: 20px; } .article-title { font-size: 1.2em; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ملخص الأخبار بالعربية</h1>
+            <p class="subtitle">ملخصات أخبار ذكية بالعربية • AI-Powered News Summaries</p>
+        </header>
+        <div class="articles">${articlesHtml}</div>
+        <footer>
+            <p style="font-size: 1.1em;">🤖 تم إنشاء هذا التقرير بواسطة الذكاء الاصطناعي</p>
+            <p>Generated by <strong>xsukax RSS Feeds Arabic AI Summarizer</strong></p>
+            <p>${new Date().toLocaleString()}</p>
+        </footer>
+    </div>
+</body>
+</html>`;
+            
+            const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `xsukax-news-report-${new Date().toISOString().split('T')[0]}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            log('📤 HTML report exported successfully', 'success');
+        }
+
+        function showModal(message, callback) {
+            document.getElementById('modalBody').textContent = message;
+            document.getElementById('confirmModal').classList.add('active');
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            modalCallback = null;
+        }
+
+        function confirmAction() {
+            if (modalCallback) {
+                modalCallback();
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
