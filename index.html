@@ -147,6 +147,10 @@
                     <span class="stat-value" id="statFailed" style="color: #f85149;">0</span>
                 </div>
                 <div class="stat-card">
+                    <span class="stat-label">Duplicates Removed</span>
+                    <span class="stat-value" id="statDuplicates" style="color: #f0883e;">0</span>
+                </div>
+                <div class="stat-card">
                     <span class="stat-label">Success Rate</span>
                     <span class="stat-value" id="statRate">0%</span>
                 </div>
@@ -172,7 +176,7 @@
 
         <div class="panel" id="resultsPanel">
             <div class="panel-header">
-                <span class="icon">📑</span>
+                <span class="icon">📰</span>
                 <h2>News Articles</h2>
             </div>
             <div id="articles">
@@ -215,6 +219,7 @@
         let isProcessing = false;
         let shouldStop = false;
         let modalCallback = null;
+        let duplicatesRemoved = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadFromStorage();
@@ -240,10 +245,86 @@
             document.getElementById('statTotal').textContent = total;
             document.getElementById('statProcessed').textContent = processed;
             document.getElementById('statFailed').textContent = failed;
+            document.getElementById('statDuplicates').textContent = duplicatesRemoved;
             document.getElementById('statRate').textContent = rate + '%';
             
             const progress = total > 0 ? ((processed + failed) / total) * 100 : 0;
             document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function normalizeText(text) {
+            return text.toLowerCase()
+                .replace(/[^\w\s]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function areArticlesSimilar(article1, article2) {
+            const title1 = normalizeText(article1.title);
+            const title2 = normalizeText(article2.title);
+            
+            if (title1 === title2) return true;
+            
+            if (article1.link && article2.link && article1.link === article2.link) return true;
+            
+            const words1 = title1.split(' ');
+            const words2 = title2.split(' ');
+            const minLength = Math.min(words1.length, words2.length);
+            
+            if (minLength >= 4) {
+                const commonWords = words1.filter(word => 
+                    word.length > 3 && words2.includes(word)
+                ).length;
+                
+                const similarity = commonWords / minLength;
+                if (similarity > 0.75) return true;
+            }
+            
+            return false;
+        }
+
+        function removeDuplicates(articlesArray) {
+            const uniqueArticles = [];
+            const seenLinks = new Set();
+            const seenTitles = new Set();
+            let duplicateCount = 0;
+            
+            for (const article of articlesArray) {
+                let isDuplicate = false;
+                
+                if (article.link && seenLinks.has(article.link)) {
+                    isDuplicate = true;
+                } else {
+                    const normalizedTitle = normalizeText(article.title);
+                    
+                    if (seenTitles.has(normalizedTitle)) {
+                        isDuplicate = true;
+                    } else {
+                        for (const existingArticle of uniqueArticles) {
+                            if (areArticlesSimilar(article, existingArticle)) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!isDuplicate) {
+                    uniqueArticles.push(article);
+                    if (article.link) seenLinks.add(article.link);
+                    seenTitles.add(normalizeText(article.title));
+                } else {
+                    duplicateCount++;
+                }
+            }
+            
+            duplicatesRemoved = duplicateCount;
+            
+            if (duplicateCount > 0) {
+                log(`🔍 Removed ${duplicateCount} duplicate article(s)`, 'warning');
+            }
+            
+            return uniqueArticles;
         }
 
         function saveConfig() {
@@ -320,9 +401,12 @@
         async function fetchRSSFeeds() {
             saveConfig();
             articles = [];
+            duplicatesRemoved = 0;
             const cutoffTime = Date.now() - (config.duration * 60 * 60 * 1000);
             
             log('📡 Fetching RSS feeds...', 'info');
+            
+            const tempArticles = [];
             
             for (const feedUrl of config.rssFeeds) {
                 if (shouldStop) break;
@@ -352,7 +436,7 @@
                         
                         if (pubDate.getTime() >= cutoffTime) {
                             const sourceName = xml.querySelector('channel > title, feed > title')?.textContent || new URL(feedUrl).hostname;
-                            articles.push({
+                            tempArticles.push({
                                 title: title.trim(),
                                 titleAr: '',
                                 link: link.trim(),
@@ -367,14 +451,17 @@
                         }
                     });
                     
-                    log(`✓ Found ${count} recent articles`, 'success');
+                    log(`✓ Found ${count} recent articles from feed`, 'success');
                 } catch (err) {
                     log(`✗ Error fetching ${feedUrl}: ${err.message}`, 'error');
                 }
             }
             
+            log(`🔍 Checking for duplicates in ${tempArticles.length} articles...`, 'info');
+            articles = removeDuplicates(tempArticles);
+            
             articles.sort((a, b) => b.published - a.published);
-            log(`✅ Total articles found: ${articles.length}`, 'success');
+            log(`✅ Total unique articles: ${articles.length}`, 'success');
             updateStats();
             displayArticles();
         }
@@ -583,6 +670,7 @@
         function clearResults() {
             showModal('Are you sure you want to clear all results?', () => {
                 articles = [];
+                duplicatesRemoved = 0;
                 document.getElementById('articles').innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📰</div>
